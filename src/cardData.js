@@ -17,7 +17,7 @@ import highpriestess from './assets/The_High_Priestess.png';
 import devil from './assets/The_Devil.png';
 import justice from './assets/Justice.png';
 import temperance from './assets/Temperance.png';
-import wheel from './assets/Wheel_of_Fortune.png';
+import wheel from './assets/Wheel_Of_Fortune.png';
 import strength from './assets/Strength.png';
 import hierophant from './assets/The_Hierophant.png';
 import emperor from './assets/The_Emperor.png';
