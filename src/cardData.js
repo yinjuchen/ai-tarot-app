@@ -135,4 +135,17 @@ const cards = [
   },
 ];
 
+// 隨機抽出三張不重複的牌,並各自決定正位/逆位(約 35% 機率逆位)
+export function drawThreeCards() {
+  const shuffled = [...cards];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, 3).map((card) => ({
+    ...card,
+    reversed: Math.random() < 0.35,
+  }));
+}
+
 export default cards;
