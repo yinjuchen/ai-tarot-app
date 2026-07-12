@@ -28,7 +28,11 @@ function App() {
 
     await sleep(1500) // "The Veil is parting..." 的停頓
 
-    const drawnCards = drawThreeCards();
+    const drawnCards = drawThreeCards().map((c, i) => ({
+      ...c,
+      positionEn: POSITIONS[i].en,
+      positionZh: POSITIONS[i].zh,
+    }));
     setSpread(drawnCards) // 牌已經決定，但先不整批顯示
     setTransitioning(false)
 

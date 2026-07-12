@@ -6,7 +6,7 @@
 - AI 模型:`gpt-4o-mini`(原本用 gpt-3.5-turbo,已換成更便宜、非棄用的模型)
 - 卡牌:22 張大阿爾克那(標準塔羅大牌全套),圖片已從 PNG 轉 WebP 並縮到顯示尺寸(63MB → 2.8MB)
 - 目前互動:三張牌排陣(處境 / 挑戰 / 建議),不重複抽牌、有機率逆位,一張一張翻牌(儀式感),可輸入今日提問,GPT 隨機用一種占卜師語氣生成整合中英文解讀,詩的長短形式每次不同
-- 已上線:https://ai-tarot-app-jjey.vercel.app/(尚未部署本輪改動)
+- 已上線:https://ai-tarot-app-jjey.vercel.app/(修好 bug 後待重新部署,見下方「已知問題」)
 - Repo:github.com/yinjuchen/ai-tarot-app
 - 費用備忘:gpt-4o-mini 約 $0.15 / 百萬 input token、$0.60 / 百萬 output token,單次三張牌請求約 $0.0002-0.0004,加提問欄位後成本增加可忽略不計
 
@@ -51,8 +51,20 @@
 - `src/App.jsx`:新增提問輸入框、`revealedCount` 控制逐張翻牌、逆位圖片旋轉樣式、persona 顯示
 - `src/index.css`:新增 `animate-card-in` 進場動畫
 
+## 已知問題與修復記錄
+
+**2026-07-12:抽牌後一直顯示 "Failed to load message"(已修復)**
+- 症狀:部署到 `ai-tarot-app-jjey` 後,正式站抽牌永遠失敗,`/api/tarot` 回 400
+- 排查:用 Chrome 攔截 `fetch` 發現送到後端的 `cards` 只有 `{name, reversed}`,缺少 `positionEn`/`positionZh`;`api/tarot.js` 驗證要求每張牌要有 `positionEn`,直接被擋掉
+- 根因:加入逐張翻牌動畫時重寫了 `drawSpread()`,漏掉了原本幫每張牌加上 `positionEn`/`positionZh` 的 `.map()` 步驟。因為畫面上的位置標籤是直接讀 `POSITIONS[i]` 陣列顯示、不是讀卡片物件上的欄位,所以視覺上完全正常,截圖驗證時沒發現,只有實際打 API 才會炸
+- 修復:`src/App.jsx` 的 `drawSpread()` 裡,`drawThreeCards()` 後補回 `.map()` 幫每張牌加上 `positionEn`/`positionZh`,本地攔截 fetch 驗證 payload 已包含這兩個欄位
+- 額外發現:同一個 GitHub repo(`yinjuchen/ai-tarot-app`)在 Vercel 底下建了三個獨立專案(`ai-tarot-app` / `ai-tarot-app-3yyd` / `ai-tarot-app-jjey`),各自環境變數分開設定,使用者不確定為何有三個,尚未清理,`ai-tarot-app-jjey` 已確認有設定 `OPENAI_API_KEY`
+
+**教訓**:之後改動涉及「資料物件被傳到 API」的邏輯時,不能只靠截圖驗證 UI 長得對,要實際攔截/檢查送出的 request payload(或直接測完整 API round trip),因為 UI 顯示的資料來源可能跟送給後端的資料來源不是同一份。
+
 ## 下一步(未決定)
-- [ ] 部署到 Vercel 並實際測試新版 prompt 的回應品質、逆位牌解讀是否合理
+- [ ] 把這次的 bugfix commit + push,重新部署 `ai-tarot-app-jjey` 並實測 GPT 回應品質、逆位牌解讀是否合理
+- [ ] 釐清並清理 Vercel 上重複的三個專案,只留一個當正式站
 - [ ] 視覺打磨:三張卡片間距、手機版排版是否需要進一步調整
 - [ ] 考慮「三張牌共用一個貫穿意象」是否要加入
 - [ ] 考慮是否保留「單抽一張」作為次要模式,或完全以三張牌排陣為主
