@@ -20,6 +20,9 @@ function App() {
     if(isDrawing) return
     setIsDrawing(true)
 
+    const askedQuestion = question // 先記住這次的提問，等下要傳給 API
+    setQuestion("")               // 輸入框馬上清空，方便下次直接打新的提問
+
     setTransitioning(true);
     setSpread(null)
     setRevealedCount(0)
@@ -42,7 +45,7 @@ function App() {
       await sleep(650)
     }
 
-    const { message, persona: personaName } = await getGptSpreadAnswer(drawnCards, question)
+    const { message, persona: personaName } = await getGptSpreadAnswer(drawnCards, askedQuestion)
     setGptResponse(message)
     setPersona(personaName)
 
@@ -67,6 +70,7 @@ function App() {
         type="text"
         value={question}
         onChange={(e) => setQuestion(e.target.value)}
+        onKeyDown={(e) => { if (e.key === 'Enter') drawSpread(); }}
         disabled={isDrawing}
         maxLength={100}
         placeholder="What's on your mind today? (optional)"
