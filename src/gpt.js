@@ -21,6 +21,9 @@ export async function getGptSpreadAnswer(spreadCards, question = "") {
 
     if (!response.ok) {
       console.error("API error", response.status)
+      if (response.status === 429) {
+        return { message: "The veil needs a moment to settle — please wait a bit before drawing again.", persona: "" }
+      }
       return { message: "Failed to load message. Please try again later", persona: "" }
     }
 

@@ -1,6 +1,30 @@
 // Vercel Serverless Function
 // This runs on the server, so the OpenAI API key never reaches the browser.
 
+// 簡易 per-IP rate limit — 防止這支公開 API 被亂打、把 OpenAI 額度燒光
+// 注意：這是進程內記憶體計數，只在同一個 serverless instance 存活期間有效，
+// 多個 instance 之間不會共用計數，不是精確的分散式限流。對側專案來說足夠擋掉
+// 單純的迴圈亂打；正式產品建議換成 Upstash Redis / Vercel KV 等跨 instance 共享的方案。
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 分鐘
+const RATE_LIMIT_MAX = 5; // 每個 IP 每分鐘最多 5 次抽牌
+const requestLog = new Map();
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  const recent = (requestLog.get(ip) || []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+  recent.push(now);
+  requestLog.set(ip, recent);
+  return recent.length > RATE_LIMIT_MAX;
+}
+
+function getClientIp(req) {
+  const forwarded = req.headers["x-forwarded-for"];
+  if (typeof forwarded === "string" && forwarded.length > 0) {
+    return forwarded.split(",")[0].trim();
+  }
+  return req.socket?.remoteAddress || "unknown";
+}
+
 // 占卜師語氣人格池 — 每次隨機挑一種聲音,避免每次讀起來都是同一個腔調
 const PERSONAS = [
   {
@@ -33,6 +57,11 @@ const LENGTH_FORMS = [
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const clientIp = getClientIp(req);
+  if (isRateLimited(clientIp)) {
+    return res.status(429).json({ error: "Too many requests. Please wait a moment before drawing again." });
   }
 
   const { cards, question } = req.body || {};
