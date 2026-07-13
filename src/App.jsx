@@ -73,15 +73,15 @@ function App() {
         onKeyDown={(e) => { if (e.key === 'Enter') drawSpread(); }}
         disabled={isDrawing}
         maxLength={100}
-        placeholder="What's on your mind today? (optional)"
+        placeholder="What's on your mind? (optional)"
         className="
           w-full max-w-xs
           bg-white/10
           border border-white/20
           focus:border-yellow-200/60
           rounded-lg
-          px-4 py-2
-          text-sm text-yellow-50
+          px-3 sm:px-4 py-2
+          text-xs sm:text-sm text-yellow-50
           placeholder-gray-400
           italic
           text-center
