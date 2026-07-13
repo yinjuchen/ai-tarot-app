@@ -30,4 +30,5 @@ dist-ssr
 PROJECT_NOTES.md
 
 # Raw screenshot dropped at repo root — the copy used in README lives in docs/screenshot.png
-Screenshot*.png
+# (leading slash anchors this to the repo root only, so it doesn't also match docs/screenshot.png)
+/Screenshot*.png
