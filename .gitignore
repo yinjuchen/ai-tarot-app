@@ -25,3 +25,9 @@ dist-ssr
 
 # .gitignore
 .env
+
+# Private dev notes — not meant to be public
+PROJECT_NOTES.md
+
+# Raw screenshot dropped at repo root — the copy used in README lives in docs/screenshot.png
+Screenshot*.png

@@ -4,10 +4,7 @@ A daily-guidance tarot app. Draw a three-card **Situation / Challenge / Advice**
 
 **Live:** [ai-tarot-app-jjey.vercel.app](https://ai-tarot-app-jjey.vercel.app/)
 
-<!--
-  Add a screenshot here once you have one:
-  ![AI Tarot screenshot](docs/screenshot.png)
--->
+![AI Tarot screenshot](docs/screenshot.png)
 
 ## Why it's not just "prompt → paragraph"
 
@@ -73,4 +70,3 @@ api/
 ## Notes
 
 - `/api/tarot` is rate-limited to 5 requests per minute per IP to protect against cost from casual or automated abuse. It's an in-memory, per-instance limiter — good enough to stop naive scripting, not a substitute for a shared store (Upstash Redis / Vercel KV) in a higher-traffic production setting.
-- See [`PROJECT_NOTES.md`](./PROJECT_NOTES.md) for the design decisions and iteration history behind this project — including a couple of bugs found and fixed along the way.
